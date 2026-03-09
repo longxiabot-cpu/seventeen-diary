@@ -17,7 +17,20 @@
             --highlight: #0000FF;
             --text: #333;
             --text-light: #666;
-            --bg: #fafafa;
+            --bg: #FAF8F5;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0,0,0,0.08);
+        }
+        
+        [data-theme="dark"] {
+            --primary: #e8a854;
+            --accent: #E8A854;
+            --highlight: #E8A854;
+            --text: #e0e0e0;
+            --text-light: #a0a0a0;
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --card-shadow: rgba(0,0,0,0.3);
         }
         
         body {
@@ -25,6 +38,39 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
+        }
+        
+        /* 阅读进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #E8A854, #f0c078);
+            z-index: 1000;
+            transition: width 0.1s;
+        }
+        
+        /* 暗色模式切换按钮 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 2px 10px var(--card-shadow);
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
         }
         
         /* Hero Section */
@@ -116,6 +162,10 @@
             border-bottom: 2px solid #eee;
         }
         
+        [data-theme="dark"] .section-title {
+            border-bottom-color: #333;
+        }
+        
         /* Cards Grid */
         .cards {
             display: grid;
@@ -125,15 +175,16 @@
         }
         
         .card {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
+            box-shadow: 0 4px 20px var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--card-shadow);
         }
         
         .card h3 {
@@ -153,19 +204,20 @@
         }
         
         .timeline-item {
-            background: white;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px var(--card-shadow);
             display: flex;
             gap: 20px;
             align-items: flex-start;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         
         .timeline-item:hover {
-            transform: translateX(5px);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--card-shadow);
         }
         
         .timeline-date {
@@ -208,6 +260,12 @@
     </style>
 </head>
 <body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- 暗色模式切换按钮 -->
+    <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+    
     <div class="hero">
         <div class="hero-content">
             <h1>十七<span>成才</span>记</h1>
@@ -277,5 +335,43 @@
     <footer>
         Made with <span>❤️</span> by 十七 & 十六
     </footer>
+    
+    <script>
+        // 暗色模式切换
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // 读取本地存储的主题
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            if (newTheme === 'dark') {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                html.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+            }
+            
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        // 阅读进度条
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            progressBar.style.width = progress + '%';
+        });
+    </script>
 </body>
 </html>
